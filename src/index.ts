@@ -114,20 +114,22 @@ const out = process.stdout;
 const ESC = '\x1b[';
 const color = (code: number, s: string) => `${ESC}${code}m${s}${ESC}0m`;
 const BANNER = [
-  ' ████  ███   ████ █   █ █████    █   █ ███ █     █',
-  '█     █   █ █     █   █ █        █  █   █  █     █',
-  '█     █████ █     █████ ████     ███    █  █     █',
-  '█     █   █ █     █   █ █        █  █   █  █     █',
-  ' ████ █   █  ████ █   █ █████    █   █ ███ █████ █████',
+  ' ██████╗ █████╗  ██████╗██╗  ██╗███████╗   ██╗  ██╗██╗██╗     ██╗     ',
+  '██╔════╝██╔══██╗██╔════╝██║  ██║██╔════╝   ██║ ██╔╝██║██║     ██║     ',
+  '██║     ███████║██║     ███████║█████╗     █████╔╝ ██║██║     ██║     ',
+  '██║     ██╔══██║██║     ██╔══██║██╔══╝     ██╔═██╗ ██║██║     ██║     ',
+  '╚██████╗██║  ██║╚██████╗██║  ██║███████╗   ██║  ██╗██║███████╗███████╗',
+  ' ╚═════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝   ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝',
 ];
+const SEA = [121, 85, 79, 78, 36, 29]; // 256-color sea-green ramp, light to dark, one per banner row
 const BYLINE = 'by Bidyut Kr. Das';
 
 function render() {
   const rows = out.rows || 24;
   const cols = out.columns || 80;
   // Banner only when it fits and still leaves room for the list.
-  const banner = rows >= 20 && cols >= BANNER[4].length + 2
-    ? [...BANNER.map((l) => color(36, ` ${l}`)), color(2, ` ${BYLINE}`), '']
+  const banner = rows >= 20 && cols >= BANNER[0].length + 2
+    ? [...BANNER.map((l, i) => `${ESC}38;5;${SEA[i]}m ${l}${ESC}0m`), color(2, ` ${BYLINE}`), '']
     : [];
   const listH = Math.max(1, rows - 4 - banner.length);
   cursor = Math.max(0, Math.min(cursor, items.length - 1));
