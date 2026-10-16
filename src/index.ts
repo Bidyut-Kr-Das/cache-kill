@@ -83,6 +83,8 @@ function fmt(bytes?: number) {
   while (bytes >= 1024 && i < units.length - 1) (bytes /= 1024), i++;
   return `${bytes.toFixed(i ? 1 : 0)} ${units[i]}`;
 }
+// Biggest first; not-yet-sized items last, in scan order (sort is stable).
+const bySize = (a: Item, b: Item) => (b.size ?? -1) - (a.size ?? -1);
 
 const items: Item[] = [];
 const sizeRun = limit(CONCURRENCY);
@@ -93,14 +95,13 @@ const scan = (onItem: () => void = () => {}) =>
 if (!process.stdout.isTTY || !process.stdin.isTTY) {
   // Pipe mode: list only, never deletes.
   await scan();
+  await Promise.all(items.map(async (it) => void (it.size = await dirSize(it.path, sizeRun))));
+  items.sort(bySize);
   let total = 0;
-  await Promise.all(
-    items.map(async (it) => {
-      const size = await dirSize(it.path, sizeRun);
-      total += size; // safe: size already awaited
-      console.log(`${fmt(size).padStart(9)}  ${it.label.padEnd(13)}  ${it.rel}`);
-    }),
-  );
+  for (const it of items) {
+    total += it.size!;
+    console.log(`${fmt(it.size).padStart(9)}  ${it.label.padEnd(13)}  ${it.rel}`);
+  }
   console.log(`${fmt(total).padStart(9)}  total, ${items.length} folders`);
   process.exit(0);
 }
@@ -132,7 +133,11 @@ function render() {
     ? [...BANNER.map((l, i) => `${ESC}38;5;${SEA[i]}m ${l}${ESC}0m`), color(2, ` ${BYLINE}`), '']
     : [];
   const listH = Math.max(1, rows - 4 - banner.length);
-  cursor = Math.max(0, Math.min(cursor, items.length - 1));
+  // Re-sort as sizes land; keep the cursor on the same item so rows moving under it don't change the selection.
+  const sel = items[cursor];
+  items.sort(bySize);
+  if (sel) cursor = items.indexOf(sel);
+  cursor =Math.max(0, Math.min(cursor, items.length - 1));
   if (cursor < scroll) scroll = cursor;
   if (cursor >= scroll + listH) scroll = cursor - listH + 1;
 
