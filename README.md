@@ -70,6 +70,7 @@ Generic names such as `target`, `build` or `bin` are matched **only** when the p
 | `gatsby` | `.cache` | next to `gatsby-config.*` |
 | `expo` | `.expo` | always |
 | `solidstart` | `.vinxi` | always |
+| `turbo` | `.turbo` | always |
 | `python` | `__pycache__`, `.pytest_cache`, `.mypy_cache`, `.ruff_cache`, `.tox`, `.venv`, `venv` | venvs only with `pyvenv.cfg` inside |
 | `rust` | `target` | next to `Cargo.toml` |
 | `maven` | `target` | next to `pom.xml` |

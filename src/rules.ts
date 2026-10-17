@@ -22,6 +22,7 @@ export const RULES: Rule[] = [
   ...r('gatsby', 'Gatsby', ['.cache'], { marker: /^gatsby-config\.[cm]?[jt]sx?$/ }),
   ...r('expo', 'Expo', ['.expo']),
   ...r('solidstart', 'SolidStart', ['.vinxi']),
+  ...r('turbo', 'Turborepo', ['.turbo']),
   // Python
   ...r('python', 'Python', ['__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.tox']),
   ...r('python', 'Python venv', ['.venv', 'venv'], { inside: 'pyvenv.cfg' }),
